@@ -6,7 +6,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-// ❌ Removido: DRACOLoader (não precisas, causava 404)
+// Removed DracoLoader because it produced 404 errors and your GLB is not Draco compressed
 // import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler.js";
@@ -20,19 +20,23 @@ class SelectiveBloomCubes {
     this.orbitControls = false;
     this.mouseMoveAnim = false;
     this.delay = 1;
+
     this.gModel = new THREE.Group();
     this.gMain = new THREE.Group();
+
     this.params = {
       threshold: 0,
       strength: 2,
       radius: 0.4,
       exposure: 1,
     };
+
     this.modlePosition = {
       x: -4,
       y: 1.493,
       z: 2.146,
     };
+
     this.init();
     this.initBloom();
     this.addCubes();
@@ -56,13 +60,7 @@ class SelectiveBloomCubes {
       alpha: true,
     });
 
-    // ❌ REMOVIDO - DRACO LOADER (causava erro e nem era necessário)
-    // const dracoLoader = new DRACOLoader();
-    // dracoLoader.setDecoderPath("https://abc-xyz.b-cdn.net/prismore/index-96witzP7.js");
-    // this.gltfLoader = new GLTFLoader();
-    // this.gltfLoader.setDRACOLoader(dracoLoader);
-
-    // ✅ GLTFLoader normal
+    // Using plain GLTFLoader since DracoLoader is removed
     this.gltfLoader = new GLTFLoader();
 
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -93,12 +91,11 @@ class SelectiveBloomCubes {
     this.grid.visible = false;
     this.scene.add(this.axis);
     this.scene.add(this.grid);
+
     this.controls.enabled = this.orbitControls;
 
     this.scene.add(this.gMain);
     this.gMain.add(this.gModel);
-    this.gMain.position.set(0, 0, 0);
-    this.gModel.position.set(0, 0, 0);
   }
 
   initBloom() {
@@ -158,7 +155,7 @@ class SelectiveBloomCubes {
   addCubes() {
     const tl = gsap.timeline();
 
-    // ✅ CORRIGIDO: URL DO MODELO
+    // Corrected GLB URL (real file served from your GitHub repository)
     this.gltfLoader.load(
       "https://cdn.jsdelivr.net/gh/twbananas/prismore-three-animation/public/prismore5.glb",
       (gltf) => {
@@ -172,8 +169,6 @@ class SelectiveBloomCubes {
             child.material.metalness = 0.1;
             child.material.roughness = 0.5;
             child.material.color.set("#6EB744");
-            child.material.depthTest = true;
-            child.material.depthWrite = true;
             child.material.transparent = true;
             child.material.opacity = 0;
 
@@ -239,8 +234,8 @@ class SelectiveBloomCubes {
       start: "top 80%",
       end: "bottom bottom",
       onEnter: () => (this.mousemoveactive = true),
-      onEnterBack: () => (this.mousemoveactive = true),
       onLeave: () => (this.mousemoveactive = true),
+      onEnterBack: () => (this.mousemoveactive = true),
       onLeaveBack: () => (this.mousemoveactive = true),
     });
   }
@@ -267,7 +262,15 @@ class SelectiveBloomCubes {
     darkAccent1.position.set(0, -8, -5);
     darkAccent2.position.set(-6, 2, 3);
 
-    this.scene.add(light, light1, light2, light3, light4, darkAccent1, darkAccent2);
+    this.scene.add(
+      light,
+      light1,
+      light2,
+      light3,
+      light4,
+      darkAccent1,
+      darkAccent2
+    );
   }
 
   darkenNonBloomed(obj) {
